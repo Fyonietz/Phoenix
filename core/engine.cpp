@@ -1,8 +1,8 @@
-#include "app.hpp"
+#include "engine.hpp"
 
 std::unordered_map<std::string,std::string> loadConfig(){
     std::unordered_map<std::string,std::string> config;
-    std::ifstream file("config/server.wpp");
+    std::ifstream file("config/server.wpc");
 
     if(!file){
         std::cerr << "Failed To Open Config File: " <<std::endl;
