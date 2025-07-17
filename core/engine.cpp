@@ -1,5 +1,12 @@
 #include "engine.hpp"
-
+std::wstring CharToWChar(const char* str) {
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+    std::wstring wstr(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str, -1, &wstr[0], size_needed);
+    // Remove the extra null terminator for std::wstring
+    if (!wstr.empty() && wstr.back() == L'\0') wstr.pop_back();
+    return wstr;
+}
 std::unordered_map<std::string,std::string> loadConfig(){
     std::unordered_map<std::string,std::string> config;
     std::ifstream file("config/server.wpc");
@@ -32,6 +39,23 @@ void initConfig() {
     Config::keep_alive = config["Keep_Alive"].c_str();
 }
 
+void routes(){
+    std::string dll_name = "core/msys-routes.dll";
+    std::wstring w_dll_name = CharToWChar(dll_name.c_str());
+    HMODULE hDLL = LoadLibraryW(w_dll_name.c_str()); 
+    if(!hDLL){
+        std::cerr << "failed to load .dll" << std::endl;
+        return;
+    }
+    Route test = (Route)GetProcAddress(hDLL,"update");
+    if(!test){
+        std::cerr << "Failed to find function" << std::endl;
+    }
+    test();
+
+    FreeLibrary(hDLL);
+    return;
+}
 
 void start(const char *root,const char *port,const char *threads,const char *alive){
   

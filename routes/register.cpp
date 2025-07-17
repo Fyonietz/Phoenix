@@ -6,7 +6,7 @@ void init(){
 }
 
 void update(){
-    std::cout << "Updated" << std::endl;
+    std::cout << "Updateds" << std::endl;
 }
 
 void shutdown(){
