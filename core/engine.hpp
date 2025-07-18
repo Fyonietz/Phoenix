@@ -8,6 +8,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unordered_map>
+#include <filesystem>
+#include <thread>
+#include <chrono>
 #include <windows.h>
 #include "civetweb.h"
 //UTILITY
@@ -24,11 +27,22 @@ struct Config{
     inline static std::string port;
     inline static std::string threads;
     inline static std::string keep_alive;
+    inline static std::string routes;
+};
+
+struct Global{
+       static std::string dll_name;
 };
 //Route Typedef 
-typedef void(*Route)();
+typedef void(*RouteFunc)();
 //Route Register
-void routes();
+void static_routes();
+//Dynamic Register
+extern HINSTANCE dllHandle ;
+extern RouteFunc routefunc ;
+extern std::filesystem::file_time_type lastWriteTime;
+bool dynamic_routes();
+void dynamic_routes_starter();
 //Server Start
 void start(const char *root,const char *port="9000",const char *threads="64",const char *alive="yes");
 #endif // !APP
