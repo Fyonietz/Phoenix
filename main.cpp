@@ -1,21 +1,22 @@
 #include <iostream>
 #include <windows.h>
+#include <thread>
 #include "engine.hpp"
 
-
-
-int main(){
+int main() {
+    std::cout << "Web++[Info]: Initializing Config..." << std::endl;
     initConfig();
 
-    if(Config::routes == "dynamic"){
+    if (Config::routes == "dynamic") {
+        std::cout << "Web++[Info]: Setting up dynamic routes..." << std::endl;
         dynamic_routes();
-        std::thread t(dynamic_routes_starter);
-        t.join();
-    }else{
+        dynamic_routes_starter();
+    } else {
         static_routes();
     }
-        std::cout << "Method:" << Config::routes << std::endl;
-    start(Config::root.c_str());
-    
+
+    std::cout << "Web++[Info]: Starting server..." << std::endl;
+    start(); 
+
     return 0;
 }

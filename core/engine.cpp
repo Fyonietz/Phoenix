@@ -1,8 +1,13 @@
 #include "engine.hpp"
 
-//Global Variable
 
+struct mg_context* server_context = nullptr;
+bool server_running = false;
+HINSTANCE dllHandle = nullptr;
+RouteFunc routefunc = nullptr;
+std::filesystem::file_time_type lastWriteTime;
 std::string Global::dll_name = "core/msys-routes.dll";
+
 
 std::wstring CharToWChar(const char* str) {
     int size_needed = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
@@ -56,7 +61,7 @@ void static_routes(){
         std::cerr << "failed to load .dll" << std::endl;
         return;
     }
-    RouteFunc test = (RouteFunc)GetProcAddress(hDLL,"update");
+    RouteFunc test = (RouteFunc)GetProcAddress(hDLL,"Routes_LinkUp");
     if(!test){
         std::cerr << "Failed to find function" << std::endl;
     }
@@ -64,83 +69,97 @@ void static_routes(){
 
     FreeLibrary(hDLL);
     return;
-}
-HINSTANCE dllHandle = nullptr;
-RouteFunc routefunc = nullptr;
-std::filesystem::file_time_type lastWriteTime;
-bool dynamic_routes(){    
+};
+
+bool dynamic_routes() {    
     std::cout << "Web++[Info]: Routes Type: Dynamic" << std::endl;
     std::wstring w_dll_name = CharToWChar(Global::dll_name.c_str());
-    if(dllHandle){
+    
+    if (dllHandle) {
         FreeLibrary(dllHandle);
-        dllHandle=nullptr;
+        dllHandle = nullptr;
     }
 
     std::string temp_dll = "core/msys-routes-temp.dll";
     std::wstring w_temp_dll = CharToWChar(temp_dll.c_str());
     
-    // Before copying, ensure the temp DLL is not locked and can be deleted
-    if (dllHandle) {
-        FreeLibrary(dllHandle);
-        dllHandle = nullptr;
-    }
     if (std::filesystem::exists(temp_dll)) {
         std::filesystem::remove(temp_dll);
     }
-    std::filesystem::copy_file(
-        Global::dll_name,
-        temp_dll,
-        std::filesystem::copy_options::overwrite_existing
-    );
+
+    try {
+        std::filesystem::copy_file(
+            Global::dll_name,
+            temp_dll,
+            std::filesystem::copy_options::overwrite_existing
+        );
+    } catch (const std::exception& e) {
+        std::cerr << "Copy failed: " << e.what() << std::endl;
+        return false;
+    }
 
     dllHandle = LoadLibrary(temp_dll.c_str());
     if(!dllHandle){
-        std::cerr << "Failed To Load DLL .\n";
+        DWORD err = GetLastError();
+        std::cerr << "Failed To Load DLL. Error: " << err << std::endl;
         return false;
     }
-    // FIX: assign to the global routefunc, not a local variable!
-    routefunc = (RouteFunc)GetProcAddress(dllHandle,"update");
+
+    routefunc = (RouteFunc)GetProcAddress(dllHandle,"Routes_LinkUp");
     if(!routefunc){
-        std::cerr << "Failed To Get Function\n";
+        DWORD err = GetLastError();
+        std::cerr << "Failed To Get Function. Error: " << err << std::endl;
         return false;
     }
+
+    std::cout << "DEBUG: Before routefunc() call" << std::endl;
+    
+    try {
+        routefunc();
+        std::cout << "DEBUG: After routefunc() call" << std::endl;
+    } catch (...) {
+        std::cerr << "CRASH: routefunc() threw an exception!" << std::endl;
+        return false;
+    }
+
     return true;
 }
 
 void dynamic_routes_starter(){
+    std::cout << "Routes Starter" << std::endl;
     lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
     while(true){
         if(std::filesystem::last_write_time(Global::dll_name) != lastWriteTime){
             lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
             std::cout << "Web++[Info]: Routes Updated" << std::endl;
             dynamic_routes();
+            system("ninja -C build routes");
         }
-        if(routefunc)routefunc();
-    
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 };
 
-
-void start(const char *root,const char *port,const char *threads,const char *alive){
-  
-    const char *config[]={
-    "document_root",root,
-    "listening_ports",port,
-    "num_threads",threads,
-    "enable_keep_alive",alive,
-    0
-    };
-
-    struct mg_callbacks callbacks={};
-    struct mg_context *context = mg_start(&callbacks,0,config);
-    if(!context){
-        std::cerr << "Failed To Start Server" << std::endl;
+void start() {
+    std::cout << "endpoint " << std::endl;
+    std::wstring w_dll_name = CharToWChar(Global::dll_name.c_str());
+    HMODULE hDLL = LoadLibraryW(w_dll_name.c_str());
+    if (!hDLL) {
+        std::cerr << "Failed to load routes DLL.\n";
         return;
-    }else{
-        std::cout << "Server Start On http://localhost:" << Config::port << std::endl;
     }
-    getchar();
 
-    mg_stop(context);
-};
+    auto Routes_LinkUp = (RoutesLinkUpFunc)GetProcAddress(hDLL, "Routes_LinkUp");
+    if (!Routes_LinkUp) {
+        std::cerr << "Failed to find Routes_LinkUp function in DLL.\n";
+        FreeLibrary(hDLL);
+        return;
+    }
+
+    Routes_LinkUp(Config::root.c_str(), Config::port.c_str(), 
+                 Config::threads.c_str(), Config::keep_alive.c_str());
+
+    // Keep main thread alive indefinitely
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+}

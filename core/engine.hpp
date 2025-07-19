@@ -1,5 +1,6 @@
 #ifndef APP
 #define APP
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -12,17 +13,15 @@
 #include <thread>
 #include <chrono>
 #include <windows.h>
-#include "civetweb.h"
-//UTILITY
-//Converter CharToWChar
+#include "shared.hpp"
+
+
 std::wstring CharToWChar(const char* str);
 
-//Config Loader
-std::unordered_map<std::string,std::string> loadConfig();
-//Init 
+std::unordered_map<std::string, std::string> loadConfig();
 void initConfig();
-//Config Struct
-struct Config{
+
+struct Config {
     inline static std::string root;
     inline static std::string port;
     inline static std::string threads;
@@ -30,20 +29,16 @@ struct Config{
     inline static std::string routes;
 };
 
-struct Global{
-       static std::string dll_name;
+struct Global {
+    static std::string dll_name;
 };
-//Route Typedef 
-typedef void(*RouteFunc)();
-//Route Register
+
+typedef void (*RouteFunc)();
+typedef void (*RoutesLinkUpFunc)(const char* root, const char* port, const char* threads, const char* alive);
+
 void static_routes();
-//Dynamic Register
-extern HINSTANCE dllHandle ;
-extern RouteFunc routefunc ;
-extern std::filesystem::file_time_type lastWriteTime;
 bool dynamic_routes();
 void dynamic_routes_starter();
-//Server Start
-void start(const char *root,const char *port="9000",const char *threads="64",const char *alive="yes");
-#endif // !APP
+void start();
 
+#endif // APP

@@ -1,5 +1,3 @@
-##Does not use space
-
 Document_Root=public
 Server_Port=9000
 Number_Threads=64
