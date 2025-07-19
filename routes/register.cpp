@@ -6,7 +6,7 @@ void init(){
 }
 
 void update(){
-    std::cout << "Updateds" << std::endl;
+    std::cout << "\rUpdateds" << std::flush;
 }
 
 void shutdown(){

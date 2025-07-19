@@ -183,6 +183,8 @@ void start(const char *root,const char *port,const char *threads,const char *ali
     "listening_ports",port,
     "num_threads",threads,
     "enable_keep_alive",alive,
+    "enable_directory_listing","no",
+    "index_files","layout.html",
     0
     };
 
