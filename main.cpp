@@ -6,7 +6,7 @@
 
 int main(){
     initConfig();
-
+    start(Config::root.c_str());
     if(Config::routes == "dynamic"){
         dynamic_routes();
         std::thread t(dynamic_routes_starter);
@@ -15,7 +15,7 @@ int main(){
         static_routes();
     }
         std::cout << "Method:" << Config::routes << std::endl;
-    start(Config::root.c_str());
+
     
     return 0;
 }

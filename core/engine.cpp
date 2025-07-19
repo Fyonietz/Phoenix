@@ -1,7 +1,7 @@
 #include "engine.hpp"
 
 //Global Variable
-
+std::mutex dllMutex;
 std::string Global::dll_name = "core/msys-routes.dll";
 
 std::wstring CharToWChar(const char* str) {
@@ -65,62 +65,116 @@ void static_routes(){
     FreeLibrary(hDLL);
     return;
 }
-HINSTANCE dllHandle = nullptr;
-RouteFunc routefunc = nullptr;
-std::filesystem::file_time_type lastWriteTime;
-bool dynamic_routes(){    
-    std::cout << "Web++[Info]: Routes Type: Dynamic" << std::endl;
-    std::wstring w_dll_name = CharToWChar(Global::dll_name.c_str());
-    if(dllHandle){
-        FreeLibrary(dllHandle);
-        dllHandle=nullptr;
+void clean_old_temp_dlls() {
+    try {
+        for (const auto& entry : std::filesystem::directory_iterator("core")) {
+            if (entry.path().string().find("msys-routes-temp-") != std::string::npos) {
+                // Don't delete our current temp DLL
+                if (dllHandle && GetModuleFileNameA(dllHandle, nullptr, 0) != 0) {
+                    char modulePath[MAX_PATH];
+                    GetModuleFileNameA(dllHandle, modulePath, MAX_PATH);
+                    if (entry.path().string() == modulePath) {
+                        continue;
+                    }
+                }
+                
+                try {
+                    std::filesystem::remove(entry.path());
+                } catch (...) {
+                    // Ignore deletion errors
+                }
+            }
+        }
+    } catch (...) {
+        // Ignore directory iteration errors
     }
-
-    std::string temp_dll = "core/msys-routes-temp.dll";
-    std::wstring w_temp_dll = CharToWChar(temp_dll.c_str());
-    
-    // Before copying, ensure the temp DLL is not locked and can be deleted
-    if (dllHandle) {
-        FreeLibrary(dllHandle);
-        dllHandle = nullptr;
-    }
-    if (std::filesystem::exists(temp_dll)) {
-        std::filesystem::remove(temp_dll);
-    }
-    std::filesystem::copy_file(
-        Global::dll_name,
-        temp_dll,
-        std::filesystem::copy_options::overwrite_existing
-    );
-
-    dllHandle = LoadLibrary(temp_dll.c_str());
-    if(!dllHandle){
-        std::cerr << "Failed To Load DLL .\n";
-        return false;
-    }
-    // FIX: assign to the global routefunc, not a local variable!
-    routefunc = (RouteFunc)GetProcAddress(dllHandle,"update");
-    if(!routefunc){
-        std::cerr << "Failed To Get Function\n";
-        return false;
-    }
-    return true;
 }
 
-void dynamic_routes_starter(){
-    lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
-    while(true){
-        if(std::filesystem::last_write_time(Global::dll_name) != lastWriteTime){
-            lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
-            std::cout << "Web++[Info]: Routes Updated" << std::endl;
-            dynamic_routes();
-        }
-        if(routefunc)routefunc();
+HMODULE dllHandle = nullptr;
+RouteFunc routefunc = nullptr;
+std::filesystem::file_time_type lastWriteTime;
+bool dynamic_routes() {    
+    std::lock_guard<std::mutex> lock(dllMutex); 
+    std::cout << "Web++[Info]: Routes Type: Dynamic" << std::endl;
     
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+    // Unload previous DLL if loaded
+    if(dllHandle) {
+        FreeLibrary(dllHandle);
+        dllHandle = nullptr;
+        routefunc = nullptr;
     }
-};
 
+    // Create a uniquely named temp DLL
+    std::string temp_dll = "core/msys-routes-temp-" + 
+                          std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + 
+                          ".dll";
+    
+    try {
+        // Copy to temp file
+        std::filesystem::copy_file(
+            Global::dll_name,
+            temp_dll,
+            std::filesystem::copy_options::overwrite_existing
+        );
+
+        // Load the new DLL
+        dllHandle = LoadLibraryA(temp_dll.c_str());
+        if(!dllHandle) {
+            DWORD err = GetLastError();
+            std::cerr << "Failed To Load DLL. Error: " << err << "\n";
+            return false;
+        }
+
+        // Get the update function
+        routefunc = (RouteFunc)GetProcAddress(dllHandle, "update");
+        if(!routefunc) {
+            std::cerr << "Failed To Get Function\n";
+            FreeLibrary(dllHandle);
+            dllHandle = nullptr;
+            return false;
+        }
+
+        // Update the last write time
+        lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
+        
+        // Clean up old temp files (optional)
+        clean_old_temp_dlls();
+        
+        return true;
+    } catch(const std::exception& e) {
+        std::cerr << "Error in dynamic_routes: " << e.what() << "\n";
+        return false;
+    }
+}
+
+void dynamic_routes_starter() {
+    while (true) {
+        try {
+            // Check for file changes
+            auto currentTime = std::filesystem::last_write_time(Global::dll_name);
+            if (currentTime != lastWriteTime) {
+               
+                if (dynamic_routes()) {
+                    std::cout << "Successfully reloaded routes!\n";
+                } else {
+                    std::cerr << "Failed to reload routes\n";
+                }
+            }
+              
+            // Call update function if available
+            if (routefunc) {
+                std::lock_guard<std::mutex> lock(dllMutex);
+                routefunc();
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+             system("ninja -C build routes > NUL 2>&1");
+        } catch (...) {
+            std::cerr << "Error in reload thread\n";
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }
+}
 
 void start(const char *root,const char *port,const char *threads,const char *alive){
   
@@ -140,7 +194,5 @@ void start(const char *root,const char *port,const char *threads,const char *ali
     }else{
         std::cout << "Server Start On http://localhost:" << Config::port << std::endl;
     }
-    getchar();
-
-    mg_stop(context);
+    
 };

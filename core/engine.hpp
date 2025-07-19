@@ -13,6 +13,8 @@
 #include <chrono>
 #include <windows.h>
 #include "civetweb.h"
+#include <thread>
+#include <mutex>
 //UTILITY
 //Converter CharToWChar
 std::wstring CharToWChar(const char* str);
@@ -38,9 +40,11 @@ typedef void(*RouteFunc)();
 //Route Register
 void static_routes();
 //Dynamic Register
-extern HINSTANCE dllHandle ;
+extern HMODULE dllHandle ;
 extern RouteFunc routefunc ;
+// extern void(*RouteFunc)();
 extern std::filesystem::file_time_type lastWriteTime;
+extern std::mutex dllMutex; 
 bool dynamic_routes();
 void dynamic_routes_starter();
 //Server Start
