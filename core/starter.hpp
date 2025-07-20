@@ -37,6 +37,7 @@ struct Config{
 
 struct Global{
        static std::string dll_name;
+       static std::string info;
 };
 #endif // !STARTER_APP
 

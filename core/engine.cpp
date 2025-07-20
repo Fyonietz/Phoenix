@@ -15,23 +15,24 @@ std::wstring CharToWChar(const char* str) {
 
 
 void release(){
-    std::cout << "Web++[Info]: Routes Type: Static" << std::endl;
+    std::cout <<Global::info << "Routes Type: Static" << std::endl;
 
     std::wstring w_dll_name = CharToWChar(Global::dll_name.c_str());
     HMODULE hDLL = LoadLibraryW(w_dll_name.c_str()); 
     if(!hDLL){
-        std::cerr << "failed to load .dll" << std::endl;
+        std::cerr <<Global::info<< "Failed To Load .dll" << std::endl;
         return;
     }
-    RouteFunc test = (RouteFunc)GetProcAddress(hDLL,"update");
-    if(!test){
-        std::cerr << "Failed to find function" << std::endl;
+   typedef void(*UpdateFunc)(struct mg_context *);
+    UpdateFunc update = (UpdateFunc)GetProcAddress(hDLL, "update");
+    if(!update){
+        std::cerr <<Global::info<< "Failed to find function" << std::endl;
     }
-    test();
-
-    FreeLibrary(hDLL);
+    update(Config::context);
     return;
 }
+
+
 void clean_old_temp_dlls() {
     try {
         for (const auto& entry : std::filesystem::directory_iterator("core")) {
@@ -57,12 +58,14 @@ void clean_old_temp_dlls() {
     }
 }
 
+
+//Debug
 HMODULE dllHandle = nullptr;
 RouteFunc routefunc = nullptr;
 std::filesystem::file_time_type lastWriteTime;
 bool debug() {    
     std::lock_guard<std::mutex> lock(dllMutex); 
-    std::cout << "Web++[Info]: Routes Type: Dynamic" << std::endl;
+    std::cout<<Global::info << "Routes Type: Dynamic" << std::endl;
     
     // Unload previous DLL if loaded
     if(dllHandle) {
@@ -88,19 +91,19 @@ bool debug() {
         dllHandle = LoadLibraryA(temp_dll.c_str());
         if(!dllHandle) {
             DWORD err = GetLastError();
-            std::cerr << "Failed To Load DLL. Error: " << err << "\n";
+            std::cerr <<Global::info << "Failed To Load DLL. Error: " << err << "\n";
             return false;
         }
 
-        // Get the update function
-        routefunc = (RouteFunc)GetProcAddress(dllHandle, "update");
-        if(!routefunc) {
-            std::cerr << "Failed To Get Function\n";
+        typedef void(*UpdateFunc)(struct mg_context *);
+        UpdateFunc update = (UpdateFunc)GetProcAddress(dllHandle, "update");
+        if(!update) {
+            std::cerr <<Global::info << "Failed To Get Function\n";
             FreeLibrary(dllHandle);
             dllHandle = nullptr;
             return false;
         }
-
+        update(Config::context);
         // Update the last write time
         lastWriteTime = std::filesystem::last_write_time(Global::dll_name);
         
@@ -109,7 +112,7 @@ bool debug() {
         
         return true;
     } catch(const std::exception& e) {
-        std::cerr << "Error in dynamic_routes: " << e.what() << "\n";
+        std::cerr << Global::info<< "Error in dynamic_routes: " << e.what() << "\n";
         return false;
     }
 }
@@ -122,9 +125,9 @@ void debug_watcher() {
             if (currentTime != lastWriteTime) {
                
                 if (debug()) {
-                    std::cout << "Successfully reloaded routes!\n";
+                    std::cout <<Global::info<< "Successfully reloaded routes!\n";
                 } else {
-                    std::cerr << "Failed to reload routes\n";
+                    std::cerr <<Global::info<< "Failed to reload routes\n";
                 }
             }
               
@@ -137,7 +140,7 @@ void debug_watcher() {
             std::this_thread::sleep_for(std::chrono::seconds(5));
              system("ninja -C build routes > NUL 2>&1");
         } catch (...) {
-            std::cerr << "Error in reload thread\n";
+            std::cerr <<Global::info<< "Error in reload thread\n";
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
     }

@@ -9,7 +9,7 @@ int main() {
     
     if (Config::routes == "debug") {
         debug_start(Config::root.c_str());
-        std::cout << "Method:" << Config::routes << std::endl;
+        std::cout << Global::info << "Method:" << Config::routes << std::endl;
         
         // Wait briefly to ensure server is fully initialized
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -20,7 +20,7 @@ int main() {
         }
     } else {
         release_start(Config::root.c_str());
-        std::cout << "Method:" << Config::routes << std::endl;
+        std::cout <<Global::info<< "Method:" << Config::routes << std::endl;
         
         // Wait briefly to ensure server is fully initialized
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

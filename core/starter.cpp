@@ -2,7 +2,7 @@
 
 
 std::string Global::dll_name = "core/msys-routes.dll";
-
+std::string Global::info = "Phoenix[Info]: ";
 std::unordered_map<std::string,std::string> loadConfig(){
     std::unordered_map<std::string,std::string> config;
     std::ifstream file("config/server.wpc");
@@ -34,9 +34,9 @@ void updateConfig(){
     Config::context = mg_start(&Config::callbacks, 0, Config::server_config);
 
     if (!Config::context) {
-    std::cerr << "Failed To Start Server From Starter" << std::endl;
+    std::cerr <<Global::info<< "Failed To Start Server From Starter" << std::endl;
 } else {
-    std::cout << "Server Started On http://localhost:" << Config::port << std::endl;
+    std::cout <<Global::info<< "Server Started On http://localhost:" << Config::port << std::endl;
 }
 }
 

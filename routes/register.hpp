@@ -8,8 +8,8 @@
 #endif
 
 extern "C"{
-    typedef void(*UpdateFunc)();
-    EXPORT void update();
+    typedef void(*UpdateFunc)(struct mg_context *);
+    EXPORT void update(struct mg_context *ctx);
     EXPORT struct Route{
         void add(struct mg_context *context,const char *url,int (*handler)(struct mg_connection *connection,void *callbackdata),void *data=0);
     }Route;

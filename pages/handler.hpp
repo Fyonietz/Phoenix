@@ -5,3 +5,4 @@
     #define EXPORT
 #endif
 EXPORT int hello(struct mg_connection *connection,void *callback);
+EXPORT int hello_other(struct mg_connection *connection,void *callback);
