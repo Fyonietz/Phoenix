@@ -1,5 +1,6 @@
 #pragma once
-
+#include "../core/starter.hpp"
+#include "../libs/civetweb.h"
 #ifdef _WIN32
     #define EXPORT __declspec(dllexport)
 #else   
@@ -8,8 +9,8 @@
 
 extern "C"{
     typedef void(*UpdateFunc)();
-
-    EXPORT void init();
     EXPORT void update();
-    EXPORT void shutdown();
+    EXPORT struct Route{
+        void add(struct mg_context *context,const char *url,int (*handler)(struct mg_connection *connection,void *callbackdata),void *data=0);
+    }Route;
 }

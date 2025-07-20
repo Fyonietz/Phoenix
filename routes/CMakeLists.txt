@@ -1,6 +1,7 @@
 file(GLOB_RECURSE PAGES "../pages/*.cpp")
 
 add_library(routes SHARED
+    "../libs/Civet/civetweb.c"
     register.cpp
     ${PAGES}
 )
