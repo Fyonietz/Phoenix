@@ -2,7 +2,7 @@
 
 
 std::string Global::dll_name = "core/msys-routes.dll";
-std::string Global::info = "Phoenix[Info]: ";
+std::string Global::info = " > Phoenix[Info]: ";
 std::unordered_map<std::string,std::string> loadConfig(){
     std::unordered_map<std::string,std::string> config;
     std::ifstream file("config/server.wpc");
