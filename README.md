@@ -1,7 +1,7 @@
 
-# Web++
+# Phoenix
 
-Web++ (WPP) is a modern web framework using C++ as its backend language. Designed for performance and flexibility, it provides a clean structure for building APIs, routing, and serving static files.
+Phoenix is a modern web framework using C++ as its backend language. Designed for performance and flexibility, it provides a clean structure for building APIs, routing, and serving static files.
 
 ## Features
 
@@ -33,7 +33,7 @@ Web++ (WPP) is a modern web framework using C++ as its backend language. Designe
 
 ```bash
 # Clone the repository
-git clone https://github.com/Fyonietz/WPP.git
+git clone https://github.com/Fyonietz/Phoenix.git
 cd WPP
 
 # Build using provided scripts
