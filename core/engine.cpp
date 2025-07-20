@@ -47,7 +47,7 @@ void initConfig() {
     Config::routes = config["Routes_Type"].c_str();
 }
 
-void static_routes(){
+void release(){
     std::cout << "Web++[Info]: Routes Type: Static" << std::endl;
 
     std::wstring w_dll_name = CharToWChar(Global::dll_name.c_str());
@@ -63,6 +63,8 @@ void static_routes(){
     test();
 
     FreeLibrary(hDLL);
+    getchar();
+    mg_stop(&context);
     return;
 }
 void clean_old_temp_dlls() {
@@ -93,7 +95,7 @@ void clean_old_temp_dlls() {
 HMODULE dllHandle = nullptr;
 RouteFunc routefunc = nullptr;
 std::filesystem::file_time_type lastWriteTime;
-bool dynamic_routes() {    
+bool debug() {    
     std::lock_guard<std::mutex> lock(dllMutex); 
     std::cout << "Web++[Info]: Routes Type: Dynamic" << std::endl;
     
@@ -147,14 +149,14 @@ bool dynamic_routes() {
     }
 }
 
-void dynamic_routes_starter() {
+void debug_watcher() {
     while (true) {
         try {
             // Check for file changes
             auto currentTime = std::filesystem::last_write_time(Global::dll_name);
             if (currentTime != lastWriteTime) {
                
-                if (dynamic_routes()) {
+                if (debug()) {
                     std::cout << "Successfully reloaded routes!\n";
                 } else {
                     std::cerr << "Failed to reload routes\n";
@@ -176,7 +178,7 @@ void dynamic_routes_starter() {
     }
 }
 
-void start(const char *root,const char *port,const char *threads,const char *alive){
+void debug_start(const char *root,const char *port,const char *threads,const char *alive){
   
     const char *config[]={
     "document_root",root,
@@ -197,4 +199,26 @@ void start(const char *root,const char *port,const char *threads,const char *ali
         std::cout << "Server Start On http://localhost:" << Config::port << std::endl;
     }
     
+};
+
+void release_start(const char *root,const char *port,const char *threads,const char *alive){
+  
+    const char *config[]={
+    "document_root",root,
+    "listening_ports",port,
+    "num_threads",threads,
+    "enable_keep_alive",alive,
+    "enable_directory_listing","no",
+    "index_files","layout.html",
+    0
+    };
+
+    struct mg_callbacks callbacks={};
+    struct mg_context *context = mg_start(&callbacks,0,config);
+    if(!context){
+        std::cerr << "Failed To Start Server" << std::endl;
+        return;
+    }else{
+        std::cout << "Server Start On http://localhost:" << Config::port << std::endl;
+    }
 };

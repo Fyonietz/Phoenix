@@ -38,16 +38,17 @@ struct Global{
 //Route Typedef 
 typedef void(*RouteFunc)();
 //Route Register
-void static_routes();
+void release();
 //Dynamic Register
 extern HMODULE dllHandle ;
 extern RouteFunc routefunc ;
 // extern void(*RouteFunc)();
 extern std::filesystem::file_time_type lastWriteTime;
 extern std::mutex dllMutex; 
-bool dynamic_routes();
-void dynamic_routes_starter();
+bool debug();
+void debug_watcher();
 //Server Start
-void start(const char *root,const char *port="9000",const char *threads="64",const char *alive="yes");
+void debug_start(const char *root,const char *port="9000",const char *threads="64",const char *alive="yes");
+void release_start(const char *root,const char *port="9000",const char *threads="64",const char *alive="yes");
 #endif // !APP
 
