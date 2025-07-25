@@ -139,7 +139,6 @@ void debug_watcher() {
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
              system("ninja -C build routes > NUL 2>&1");
-             system("rm 1");
         } catch (...) {
             std::cerr <<Global::info<< "Error in reload thread\n";
             std::this_thread::sleep_for(std::chrono::seconds(5));

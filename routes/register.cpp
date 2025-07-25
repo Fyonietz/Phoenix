@@ -11,8 +11,8 @@ extern "C" EXPORT void update(struct mg_context *context) {
         std::cerr <<info<< "Cannot Register Routes - Server Context Is Missing!" << std::endl;
         return;
     }
-    
+    std::cout <<info << "Routes Check" << std::endl <<std::flush;
     // Register all routes here
     Route.add(context, "/about", about, 0);
-    std::cout <<info << "Routes Registered Successfully" << std::flush <<std::endl;
+    std::cout <<info << "Routes Safe" << std::flush <<std::endl;
 }   
