@@ -39,3 +39,6 @@ cd WPP
 # Build using provided scripts
 ./scripts/build.cmd         # or use your build system
 
+#Or Using Phoenix-Cli
+git clone https://github.com/Fyonietz/Phoenix-Cli.git
+pnix talon
