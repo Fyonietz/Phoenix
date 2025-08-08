@@ -15,5 +15,10 @@ extern "C" EXPORT void update(struct mg_context *context) {
     // Register all routes here
     Route.add(context, "/about", about, 0);
     Route.add(context,"/",home,0);
+    Route.add(context, "/example", [](struct mg_connection *conn, void *data) -> int {
+        mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
+        mg_printf(conn, "Hello, World!");
+        return 200;
+    });
     std::cout <<info << "Routes Safe" << std::flush <<std::endl;
-}   
+}

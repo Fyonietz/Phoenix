@@ -7,7 +7,7 @@
 #ifdef _WIN32
     #define EXPORT __declspec(dllexport)
 #else   
-    #define EXPORT
+    #define EXPORT __attribute__((visibility("default")))
 #endif
 extern "C" struct EXPORT Pnix{
 std::string copy_block(std::string layout, std::string tag) {

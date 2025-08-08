@@ -12,10 +12,15 @@
 #include <filesystem>
 #include <thread>
 #include <chrono>
+#ifdef _WIN32
 #include <windows.h>
+#endif // DEBUG
 #include "civetweb.h"
 #include <thread>
 #include <mutex>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
 
 //Config Loader
 std::unordered_map<std::string,std::string> loadConfig();

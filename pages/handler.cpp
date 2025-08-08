@@ -11,3 +11,8 @@ EXPORT int about(struct mg_connection *connection,void *callback){
     Server.SSR("public/views/about.html",connection);
     return 200;  
 };
+
+EXPORT int homes(struct mg_connection *connection,void *callback){
+    Server.SSR("public/views/about.html",connection);
+    return 200;  
+};

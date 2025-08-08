@@ -6,9 +6,7 @@ add_library(routes SHARED
     ${PAGES}
 )
 set_source_files_properties(register.cpp ${PAGES} PROPERTIES SKIP_AUTOMOC TRUE)
-target_link_libraries(routes
- ws2_32
-)
+
 
 target_include_directories(routes
     PRIVATE ${CMAKE_SOURCE_DIR}
