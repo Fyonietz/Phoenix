@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wl,--allow-shlib-undefined -Wl,--dependency-file=CMakeFiles/routes.dir/link.d -shared -Wl,-soname,libroutes.so -o /home/fyonietz/Repo/Ex-Phoenix/libroutes.so CMakeFiles/routes.dir/phoenix.cpp.o CMakeFiles/routes.dir/route_register.cpp.o CMakeFiles/routes.dir/__/__/main/routes/home.cpp.o  -ldl

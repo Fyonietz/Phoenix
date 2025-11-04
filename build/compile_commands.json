@@ -1,0 +1,38 @@
+[
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build",
+  "command": "/usr/bin/c++ -DLINUX -DNO_SSL -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix -std=gnu++17 -o CMakeFiles/Phoenix.dir/core/core.cpp.o -c /home/fyonietz/Repo/Ex-Phoenix/core/core.cpp",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/core/core.cpp",
+  "output": "CMakeFiles/Phoenix.dir/core/core.cpp.o"
+},
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build",
+  "command": "/usr/bin/c++ -DLINUX -DNO_SSL -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix -std=gnu++17 -o CMakeFiles/Phoenix.dir/core/phoenix/engine.cpp.o -c /home/fyonietz/Repo/Ex-Phoenix/core/phoenix/engine.cpp",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/core/phoenix/engine.cpp",
+  "output": "CMakeFiles/Phoenix.dir/core/phoenix/engine.cpp.o"
+},
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build",
+  "command": "/usr/bin/cc -DLINUX -DNO_SSL -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix  -o CMakeFiles/Phoenix.dir/core/libs/Civet/civetweb.c.o -c /home/fyonietz/Repo/Ex-Phoenix/core/libs/Civet/civetweb.c",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/core/libs/Civet/civetweb.c",
+  "output": "CMakeFiles/Phoenix.dir/core/libs/Civet/civetweb.c.o"
+},
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build/core/handler",
+  "command": "/usr/bin/c++ -Droutes_EXPORTS -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix -I/home/fyonietz/Repo/Ex-Phoenix/main/routes -std=gnu++17 -fPIC -o CMakeFiles/routes.dir/phoenix.cpp.o -c /home/fyonietz/Repo/Ex-Phoenix/core/handler/phoenix.cpp",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/core/handler/phoenix.cpp",
+  "output": "core/handler/CMakeFiles/routes.dir/phoenix.cpp.o"
+},
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build/core/handler",
+  "command": "/usr/bin/c++ -Droutes_EXPORTS -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix -I/home/fyonietz/Repo/Ex-Phoenix/main/routes -std=gnu++17 -fPIC -o CMakeFiles/routes.dir/route_register.cpp.o -c /home/fyonietz/Repo/Ex-Phoenix/core/handler/route_register.cpp",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/core/handler/route_register.cpp",
+  "output": "core/handler/CMakeFiles/routes.dir/route_register.cpp.o"
+},
+{
+  "directory": "/home/fyonietz/Repo/Ex-Phoenix/build/core/handler",
+  "command": "/usr/bin/c++ -Droutes_EXPORTS -I/home/fyonietz/Repo/Ex-Phoenix/core/handler -I/home/fyonietz/Repo/Ex-Phoenix/core/libs -I/home/fyonietz/Repo/Ex-Phoenix/core/phoenix -I/home/fyonietz/Repo/Ex-Phoenix/main/routes -std=gnu++17 -fPIC -o CMakeFiles/routes.dir/__/__/main/routes/home.cpp.o -c /home/fyonietz/Repo/Ex-Phoenix/main/routes/home.cpp",
+  "file": "/home/fyonietz/Repo/Ex-Phoenix/main/routes/home.cpp",
+  "output": "core/handler/CMakeFiles/routes.dir/__/__/main/routes/home.cpp.o"
+}
+]

@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/fyonietz/Repo/Ex-Phoenix/build/cmake_install.cmake",
+		"/home/fyonietz/Repo/Ex-Phoenix/build/core/handler/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
