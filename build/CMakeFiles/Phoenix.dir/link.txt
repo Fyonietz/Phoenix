@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--export-dynamic -Wl,--dependency-file=CMakeFiles/Phoenix.dir/link.d CMakeFiles/Phoenix.dir/core/core.cpp.o CMakeFiles/Phoenix.dir/core/phoenix/engine.cpp.o CMakeFiles/Phoenix.dir/core/libs/Civet/civetweb.c.o -o /home/fyonietz/Repo/Ex-Phoenix/Phoenix

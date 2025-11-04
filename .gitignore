@@ -1,0 +1,63 @@
+
+# General build files
+build/
+/bin/
+/obj/
+/Debug/
+/Release/
+/CMakeFiles/
+/CMakeCache.txt
+Makefile
+Makefile.user
+*.make
+
+# IDE specific files (e.g., Visual Studio, Eclipse, CLion)
+.vscode/
+/.idea/
+/*.suo
+/*.user
+/*.userosscache
+/*.sln
+/*.vcxproj
+/*.vcxproj.user
+*.xcodeproj
+*.xcworkspace
+*.clion
+
+# Compiler output
+*.o
+*.a
+*.so
+*.exe
+*.dll
+*.lib
+*.dylib
+*.pdb
+*.idb
+*.ipdb
+
+# C++ debug and object files
+*.obj
+*.gch
+*.pch
+
+# Temporary files
+*.log
+*.bak
+*.swp
+*.tmp
+*.core
+
+# C++ specific
+*.out
+*.dSYM/
+
+# Coverage data (e.g., gcov)
+*.gcda
+*.gcno
+
+# QT-specific
+*.moc
+*.qmake.stash
+*.qmake.cache
+

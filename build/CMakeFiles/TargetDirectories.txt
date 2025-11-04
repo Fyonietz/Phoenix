@@ -1,6 +1,0 @@
-/home/fyonietz/Repo/Ex-Phoenix/build/CMakeFiles/Phoenix.dir
-/home/fyonietz/Repo/Ex-Phoenix/build/CMakeFiles/edit_cache.dir
-/home/fyonietz/Repo/Ex-Phoenix/build/CMakeFiles/rebuild_cache.dir
-/home/fyonietz/Repo/Ex-Phoenix/build/core/handler/CMakeFiles/routes.dir
-/home/fyonietz/Repo/Ex-Phoenix/build/core/handler/CMakeFiles/edit_cache.dir
-/home/fyonietz/Repo/Ex-Phoenix/build/core/handler/CMakeFiles/rebuild_cache.dir
