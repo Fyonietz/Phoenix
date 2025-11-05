@@ -1,5 +1,3 @@
----
-
 # Phoenix 🚀
 
 **A high-performance, lightweight MVC web framework for C++**
