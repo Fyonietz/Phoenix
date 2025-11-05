@@ -85,7 +85,6 @@ Edit the `config/core/server.wpc` file to define:
 
 * Server port and address
 * Route file paths
-* Logging and performance settings
 
 Example:
 
@@ -95,6 +94,28 @@ Document_Root=main/public
 Server_Port=9000
 Number_Threads=64
 Keep_Alive=yes
+```
+
+---
+
+---
+
+## 🧩 Env
+
+Edit the `config/main/app.wpc` file to define:
+
+* Database Server port and address
+* API KEY
+
+Example:
+
+```ini
+
+env=100
+API_KEY=onehundred
+
+Server.env()["API_KEY"];<-onehundred
+
 ```
 
 ---
