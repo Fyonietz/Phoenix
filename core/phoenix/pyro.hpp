@@ -1,16 +1,16 @@
+#include <atomic>
+#include <condition_variable>
+#include <cstring>
 #include <engine.hpp>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <atomic>
-#include <thread>
-#include <mutex>
 #include <functional>
-#include <queue>
-#include <condition_variable>
 #include <future>
-#include <cstring>
+#include <mutex>
+#include <queue>
 #include <sstream>
+#include <string>
+#include <thread>
+#include <vector>
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
 #else
@@ -20,73 +20,98 @@
 struct Pnix {
   // ThreadPool nested struct inside Pnix
   struct ThreadPool {
-    std::vector<std::thread> workers;       // List of all threads
-    std::queue<std::function<void()>> tasks; // List of all tasks
-    std::mutex queueLock;                   // Protect data access
-    std::condition_variable condition;      // Condition for sync
-    std::atomic<bool> stop;                 // Stop flag
+    std::vector<std::thread> workers;
+    std::queue<std::function<void()>> tasks;
+    std::mutex queueLock;
+    std::condition_variable condition;
+    std::atomic<bool> stop;
 
     explicit ThreadPool(size_t numThreads) : stop(false) {
       workers.reserve(numThreads);
-
-      // Start worker threads
       for (size_t i = 0; i < numThreads; ++i) {
         workers.emplace_back([this]() {
           while (true) {
             std::function<void()> task;
             {
               std::unique_lock<std::mutex> lock(queueLock);
+              condition.wait(
+                  lock, [this]() { return stop.load() || !tasks.empty(); });
 
-              // Wait until there is a task or stop signal
-              condition.wait(lock, [this]() { return stop || !tasks.empty(); });
-
-              if (stop && tasks.empty()) return; // Stop if done
+              if (stop.load() && tasks.empty())
+                return;
 
               task = std::move(tasks.front());
               tasks.pop();
             }
-            task(); // Execute the task
+            task();
           }
         });
       }
     }
 
     ~ThreadPool() {
-      stop = true;
+      // Set stop flag first
+      stop.store(true);
+
+      // Notify all threads
       condition.notify_all();
 
-      for (auto& worker : workers) {
-        worker.join();
+      // Wait for all threads to finish
+      for (auto &worker : workers) {
+        if (worker.joinable()) {
+          worker.join();
+        }
       }
     }
 
-    // Enqueue a new task to the pool
     template <class F, class... Args>
-    auto async(F&& f, Args&&... args) -> std::future<typename std::invoke_result<F, Args...>::type> {
+    auto async(F &&f, Args &&...args)
+        -> std::future<typename std::invoke_result<F, Args...>::type> {
       using returnType = typename std::invoke_result<F, Args...>::type;
 
+      // Check if pool is stopped before enqueueing
+      if (stop.load()) {
+        throw std::runtime_error("Enqueue on stopped ThreadPool");
+      }
+
       auto task = std::make_shared<std::packaged_task<returnType()>>(
-          std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-      );
+          std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
       std::future<returnType> res = task->get_future();
       {
         std::unique_lock<std::mutex> lock(queueLock);
 
-        if (stop) throw std::runtime_error("Enqueue on stopped ThreadPool");
+        // Double-check after acquiring lock
+        if (stop.load()) {
+          throw std::runtime_error("Enqueue on stopped ThreadPool");
+        }
+
         tasks.push([task]() { (*task)(); });
       }
 
       condition.notify_one();
       return res;
     }
+
+    // Add a method to safely shutdown the pool
+    void shutdown() {
+      stop.store(true);
+      condition.notify_all();
+
+      std::unique_lock<std::mutex> lock(queueLock);
+      // Clear pending tasks to avoid executing during shutdown
+      while (!tasks.empty()) {
+        tasks.pop();
+      }
+    }
   };
+  ;
 
   // ThreadPool instance as a member
   ThreadPool method;
 
   Pnix(size_t numThreads) : method(numThreads) {}
-  std::unordered_map<std::string,std::string> env(){
+  std::unordered_map<std::string, std::string> env() {
     auto env = wpc_loader("config/main/app.wpc");
 
     return env;
@@ -104,7 +129,7 @@ struct Pnix {
 
     return status_code;
   }
-  
+
   void static_serve(const std::string path, struct mg_connection *connection) {
     std::ifstream file(path);
     if (!file) {
@@ -199,6 +224,5 @@ struct Pnix {
 
     return status_code;
   }
-
 };
-extern Pnix Server; 
+extern Pnix Server;
