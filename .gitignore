@@ -10,7 +10,7 @@ build/
 Makefile
 Makefile.user
 *.make
-
+.cache/
 # IDE specific files (e.g., Visual Studio, Eclipse, CLion)
 .vscode/
 /.idea/
